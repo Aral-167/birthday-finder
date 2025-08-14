@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Birthday Finder</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>Birthday Finder</h1>
+      <p class="subtitle">Enter your birth date to see details.</p>
+
+      <form id="birthday-form" autocomplete="off">
+        <label for="birthday">Your birthday</label>
+        <input id="birthday" name="birthday" type="date" required />
+        <button type="submit">Check</button>
+        <button type="button" id="reset">Reset</button>
+      </form>
+
+      <section id="results" class="results hidden" aria-live="polite">
+        <div class="cards">
+          <div class="card">
+            <div class="card-title">Weekday you were born</div>
+            <div id="weekday-born" class="card-value">—</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Days since last birthday</div>
+            <div id="days-since" class="card-value">—</div>
+            <div id="last-bday-label" class="card-foot note">—</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Days until next birthday</div>
+            <div id="days-until" class="card-value">—</div>
+            <div id="next-bday-label" class="card-foot note">—</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Age on next birthday</div>
+            <div id="age-next" class="card-value">—</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Total days since birth</div>
+            <div id="days-since-birth" class="card-value">—</div>
+          </div>
+        </div>
+
+        <p class="fineprint" id="assumption"></p>
+      </section>
+
+      <footer class="footer">
+        <span>Local time: <span id="now"></span></span>
+      </footer>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+  </html>

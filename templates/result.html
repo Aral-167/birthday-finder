@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<p class="subtitle">For birthday: <strong>{{ birth.strftime('%A, %B %d, %Y') }}</strong></p>
+<div class="cards">
+  <div class="card">
+    <div class="card-title">Weekday you were born</div>
+    <div class="card-value">{{ info.weekday_born }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Days since last birthday</div>
+    <div class="card-value">{{ info.days_since_last }}</div>
+    <div class="card-foot note">Last birthday: {{ info.last_birthday.strftime('%A, %B %d, %Y') }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Days until next birthday</div>
+    <div class="card-value">{{ info.days_until_next }}</div>
+    <div class="card-foot note">Next birthday: {{ info.next_birthday.strftime('%A, %B %d, %Y') }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Age on next birthday</div>
+    <div class="card-value">{{ info.age_on_next }}</div>
+  </div>
+  <div class="card">
+    <div class="card-title">Total days since birth</div>
+    <div class="card-value">{{ info.days_since_birth }}</div>
+  </div>
+</div>
+
+<p class="fineprint">
+  {% if birth.month == 2 and birth.day == 29 %}
+  Note: Born on Feb 29. In non-leap years we use Feb 28 for calculations.
+  {% endif %}
+</p>
+
+<p><a href="{{ url_for('index') }}">Back</a></p>
+{% endblock %}

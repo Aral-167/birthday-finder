@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Finder</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+  <main class="container">
+  <h1>Birthday Finder</h1>
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+    {% block content %}{% endblock %}
+    <footer class="footer">Powered by Flask</footer>
+  </main>
+</body>
+</html>

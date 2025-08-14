@@ -1,0 +1,39 @@
+:root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#22c55e;--accent2:#38bdf8;--danger:#ef4444}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(160deg,#0f172a 0%,#0b1326 100%);color:var(--text)}
+.container{max-width:900px;margin:40px auto;padding:0 20px}
+.subtitle{color:var(--muted);margin:-8px 0 24px}
+.form{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:16px;border-radius:12px}
+label{font-weight:600}
+input[type=date]{appearance:none;background:#ffffff;color:#0b1020;border:1px solid #d1d5db;border-radius:8px;padding:10px 12px}
+input[type=date]:focus{outline:none;box-shadow:0 0 0 3px rgba(148,163,184,.35)}
+button{background:#ffffff;border:1px solid #d1d5db;color:#0b1020;font-weight:700;padding:10px 14px;border-radius:8px;cursor:pointer}
+button:hover{background:#f8fafc}
+.error{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.5);padding:12px;border-radius:10px;margin-bottom:10px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:16px;border-radius:12px}
+.card-title{color:var(--muted);font-size:.95rem;margin-bottom:6px}
+.card-value{font-size:1.8rem;font-weight:800}
+.card-foot{margin-top:6px;color:var(--muted)}
+.note{font-size:.85rem}
+.footer{margin-top:28px;color:var(--muted);font-size:.9rem}
+.fineprint{margin-top:12px;color:var(--muted);font-size:.85rem}
+.muted{color:var(--muted)}
+
+/* Make the calendar icon clearly visible on the new light input */
+input[type=date]{color-scheme:light}
+input[type=date]::-webkit-calendar-picker-indicator{filter:none; opacity:.9; cursor:pointer}
+input[type=date]::-webkit-inner-spin-button,
+input[type=date]::-webkit-clear-button{filter:none}
+
+/* Calendar */
+.calendar-header{display:flex;align-items:center;justify-content:space-between;margin:12px 0}
+.calendar-header h2{margin:0}
+.calendar-header .nav{color:var(--text);text-decoration:none;font-weight:700;background:rgba(255,255,255,0.08);padding:6px 10px;border-radius:8px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:12px;border-radius:12px}
+.calendar-grid .dow{color:var(--muted);font-weight:700;text-align:center}
+.calendar-grid .day, .calendar-grid .day.empty{display:flex;align-items:center;justify-content:center;height:48px;border-radius:8px;text-decoration:none}
+.calendar-grid .day{background:#0b1020;color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+.calendar-grid .day:hover{outline:2px solid var(--accent2)}
+.calendar-grid .day.empty{background:transparent;border:1px dashed rgba(255,255,255,0.08)}
