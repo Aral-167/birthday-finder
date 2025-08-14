@@ -1,28 +1,53 @@
 # Birthday Finder
 
-A tiny, dependency-free web app. Enter your birth date and it shows:
+Enter your birth date and it shows:
 
-- Day of the week you were born
-- Days since your last birthday
-- Days until your next birthday
-- Age on your next birthday
+- Weekday you were born
+- Days since last birthday
+- Days until next birthday
+- Age on next birthday
+- Total days since birth
 
 Feb 29 birthdays are handled: in non-leap years, Feb 28 is used.
 
-## Run
+## Option A: Python web app (Flask)
 
-Just open `index.html` in your browser. No build needed.
-
-On Windows, you can also start a lightweight local server (optional) for nicer file URLs:
+From the project root:
 
 ```powershell
-# from the project folder
-powershell -NoProfile -Command "Add-Type -AssemblyName System.Net.HttpListener; $h=New-Object Net.HttpListener; $h.Prefixes.Add('http://localhost:8080/'); $h.Start(); Write-Host 'Serving on http://localhost:8080 (Ctrl+C to stop)'; while($h.IsListening){ $ctx=$h.GetContext(); $path=Join-Path (Get-Location) ($ctx.Request.Url.LocalPath.TrimStart('/')); if([string]::IsNullOrWhiteSpace($ctx.Request.Url.LocalPath) -or $ctx.Request.Url.LocalPath -eq '/'){$path='index.html'}; if(Test-Path $path){ $bytes=[System.IO.File]::ReadAllBytes($path); $ctx.Response.ContentType=([System.Web.MimeMapping]::GetMimeMapping($path)); $ctx.Response.OutputStream.Write($bytes,0,$bytes.Length)} else { $ctx.Response.StatusCode=404; $bytes=[Text.Encoding]::UTF8.GetBytes('Not Found'); $ctx.Response.OutputStream.Write($bytes,0,$bytes.Length)}; $ctx.Response.Close() }"
+C:/_aral/swPrjs2/birthday_finder/birthday-finder/.venv/Scripts/python.exe -m pip install -r requirements.txt
+C:/_aral/swPrjs2/birthday_finder/birthday-finder/.venv/Scripts/python.exe app.py
 ```
 
-Or use any simple server you like.
+Open http://127.0.0.1:5000
+
+- Calendar picker: http://127.0.0.1:5000/calendar
+
+Stop with Ctrl+C.
+
+## Option B: Static page (no server)
+
+Open `index.html` directly in your browser:
+
+```powershell
+Start-Process "c:\_aral\swPrjs2\birthday_finder\birthday-finder\index.html"
+```
+
+## Optional: Desktop and CLI
+
+- Tkinter desktop app:
+
+```powershell
+C:/_aral/swPrjs2/birthday_finder/birthday-finder/.venv/Scripts/python.exe python_app/app_tk.py
+```
+
+- CLI:
+
+```powershell
+C:/_aral/swPrjs2/birthday_finder/birthday-finder/.venv/Scripts/python.exe python_app/cli.py 1990-08-13
+```
 
 ## Notes
 
-- Uses local time and local timezone.
-- HTML date input relies on the browser; on older browsers you might see a plain text field.
+- Uses local time/timezone for calculations.
+- Feb 29 birthdays use Feb 28 on non-leap years.

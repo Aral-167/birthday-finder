@@ -1,12 +1,12 @@
 # Birthday Finder (Python)
 
 Python version with both a GUI (Tkinter) and a CLI.
+# Birthday Finder (Python components)
+
+Python components used by the project: a reusable core module, a Tkinter GUI, and a CLI. The Flask web app lives at the project root (`app.py`).
 
 ## Structure
-- `birthday_core.py` — pure logic functions and dataclass
-- `app_tk.py` — Tkinter desktop UI
-- `cli.py` — command-line entry
-- `tests/` — unit tests for the core logic
+- `birthday_core.py` — pure logic functions and dataclass (weekday, days since/until, total days since birth, etc.)
 
 ## Run (GUI)
 ```powershell
@@ -27,5 +27,4 @@ pytest -q
 ```
 
 Notes:
-- Works with Python 3.8+.
-- Feb 29 birthdays use Feb 28 on non-leap years.
+- Core logic is covered by tests in `tests/`.
