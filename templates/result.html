@@ -1,30 +1,65 @@
 {% extends 'base.html' %}
 {% block content %}
-<p class="subtitle">For birthday: <strong>{{ birth.strftime('%A, %B %d, %Y') }}</strong></p>
-<div class="cards">
+<div class="banner">
+  <div>
+    {% if info.days_until_next == 0 %}
+    <div class="label">Happy Birthday! 🎉</div>
+    {% else %}
+    <div class="label">Birthday</div>
+    {% endif %}
+    <div class="value">{{ birth.strftime('%A, %B %d, %Y') }} <span class="badge">Turning {{ info.age_on_next }}</span></div>
+  </div>
+  <div class="actions">
+    <button class="btn-secondary" id="copy-birth" type="button">Copy date</button>
+    <button class="btn-secondary" id="share-link" type="button">Copy link</button>
+    <a href="{{ url_for('index') }}" class="btn-secondary">Change</a>
+  </div>
+  </div>
+<div class="cards reveal">
   <div class="card">
     <div class="card-title">Weekday you were born</div>
-    <div class="card-value">{{ info.weekday_born }}</div>
+    <div class="card-value metric">{{ info.weekday_born }}</div>
   </div>
   <div class="card">
     <div class="card-title">Days since last birthday</div>
-    <div class="card-value">{{ info.days_since_last }}</div>
+  <div class="card-value metric">{{ info.days_since_last|comma }}</div>
     <div class="card-foot note">Last birthday: {{ info.last_birthday.strftime('%A, %B %d, %Y') }}</div>
   </div>
   <div class="card">
     <div class="card-title">Days until next birthday</div>
-    <div class="card-value">{{ info.days_until_next }}</div>
+  <div class="card-value metric">{{ info.days_until_next|comma }}</div>
     <div class="card-foot note">Next birthday: {{ info.next_birthday.strftime('%A, %B %d, %Y') }}</div>
   </div>
   <div class="card">
+    <div class="card-title">Timeline</div>
+    <div class="timeline">
+      <div class="timeline-labels">
+        <span>Last: {{ info.last_birthday.strftime('%b %d') }}</span>
+        <span>Next: {{ info.next_birthday.strftime('%b %d') }}</span>
+      </div>
+      <div class="timeline-track">
+        <div id="timeline-marker" class="timeline-marker" style="left:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Year progress</div>
+    <div class="progress" aria-label="Progress through your birthday year" aria-valuemin="0" aria-valuemax="100">
+      <div id="year-progress-bar" class="progress-bar" style="width:0%"></div>
+    </div>
+    <div id="year-progress-foot" class="card-foot note"></div>
+  </div>
+  <div class="card">
     <div class="card-title">Age on next birthday</div>
-    <div class="card-value">{{ info.age_on_next }}</div>
+    <div class="card-value metric">{{ info.age_on_next }}</div>
   </div>
   <div class="card">
     <div class="card-title">Total days since birth</div>
-    <div class="card-value">{{ info.days_since_birth }}</div>
+  <div class="card-value metric">{{ info.days_since_birth|comma }}</div>
   </div>
 </div>
+
+<div id="bday-meta" data-since="{{ info.days_since_last }}" data-until="{{ info.days_until_next }}" data-isbday="{{ 1 if info.days_until_next == 0 else 0 }}" hidden></div>
 
 <p class="fineprint">
   {% if birth.month == 2 and birth.day == 29 %}
@@ -33,4 +68,80 @@
 </p>
 
 <p><a href="{{ url_for('index') }}">Back</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (function(){
+    const btn = document.getElementById('copy-birth');
+  const share = document.getElementById('share-link');
+    if(!btn) return;
+    btn.addEventListener('click', async ()=>{
+      try{
+        await navigator.clipboard.writeText('{{ birth.isoformat() }}');
+        btn.textContent = 'Copied!';
+  window.showToast && window.showToast('Birthday copied to clipboard');
+        setTimeout(()=>btn.textContent='Copy date',1200);
+      }catch(e){
+        btn.textContent = 'Copy failed';
+  window.showToast && window.showToast('Copy failed');
+        setTimeout(()=>btn.textContent='Copy date',1200);
+      }
+    });
+    if(share){
+      share.addEventListener('click', async ()=>{
+        const url = new URL(window.location.origin + "{{ url_for('calc') }}");
+        url.searchParams.set('birthday', '{{ birth.isoformat() }}');
+        const link = url.toString();
+        if(navigator.share){
+          try{
+            await navigator.share({ title:'Birthday Finder', text:'Check out my birthday stats', url: link });
+          }catch(_e){ /* user canceled */ }
+          return;
+        }
+        try{
+          await navigator.clipboard.writeText(link);
+          window.showToast && window.showToast('Link copied');
+        }catch(e){
+          window.showToast && window.showToast('Copy failed');
+        }
+      });
+    }
+  })();
+  // Year progress + celebrate on the day 🎉
+  (function(){
+    const meta = document.getElementById('bday-meta');
+    if(!meta) return;
+    const since = parseInt(meta.dataset.since||'0', 10);
+    const until = parseInt(meta.dataset.until||'0', 10);
+    const total = since + until;
+    const percent = total > 0 ? Math.floor((since*100)/total) : 0;
+    const bar = document.getElementById('year-progress-bar');
+    const foot = document.getElementById('year-progress-foot');
+    if(bar){ bar.style.width = percent + '%'; bar.setAttribute('aria-valuenow', String(percent)); }
+    if(foot){ foot.textContent = percent + '% of the way from your last birthday to the next'; }
+
+    // Timeline marker position matches progress
+    const marker = document.getElementById('timeline-marker');
+    if(marker){ marker.style.left = percent + '%'; }
+
+    const isBday = meta.dataset.isbday === '1';
+    if(!isBday) return;
+    function dropConfetti(count){
+      const emojis = ['🎉','✨','🎈','🎊','⭐'];
+      for(let i=0;i<count;i++){
+        const s = document.createElement('span');
+        s.className = 'confetti';
+        s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+        s.style.left = Math.random()*100 + 'vw';
+        s.style.animationDelay = (Math.random()*0.6) + 's';
+        s.style.fontSize = (Math.random()*14 + 12) + 'px';
+        document.body.appendChild(s);
+        s.addEventListener('animationend', ()=> s.remove());
+      }
+    }
+    dropConfetti(80);
+    window.showToast && window.showToast('Happy Birthday!');
+  })();
+</script>
 {% endblock %}

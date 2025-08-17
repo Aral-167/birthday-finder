@@ -11,6 +11,13 @@ from python_app.birthday_core import calculate_birthday_info
 
 app = Flask(__name__)
 
+@app.template_filter('comma')
+def comma_filter(n: int) -> str:
+    try:
+        return f"{int(n):,}"
+    except Exception:
+        return str(n)
+
 
 def parse_ymd(value: str) -> Optional[date]:
     try:
@@ -22,7 +29,7 @@ def parse_ymd(value: str) -> Optional[date]:
 
 @app.get("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", today=date.today(), active_page="home")
 
 
 @app.route("/calc", methods=["GET", "POST"])
@@ -34,13 +41,18 @@ def calc():
 
     birth = parse_ymd(b)
     if not birth:
-        return render_template("index.html", error="Please enter a valid date (YYYY-MM-DD)."), 400
+        return render_template("index.html", error="Please enter a valid date (YYYY-MM-DD).", today=date.today()), 400
 
-    info = calculate_birthday_info(birth)
+    today_d = date.today()
+    if birth > today_d:
+        return render_template("index.html", error="Birthday cannot be in the future.", today=today_d), 400
+
+    info = calculate_birthday_info(birth, today_d)
     return render_template(
         "result.html",
         birth=birth,
         info=info,
+        active_page="result",
     )
 
 
@@ -53,6 +65,11 @@ def api_calc():
 
     today_param = request.args.get("today")
     today = parse_ymd(today_param) if today_param else None
+
+    if today is None:
+        today = date.today()
+    if birth > today:
+        return jsonify({"error": "Birthday cannot be in the future."}), 400
 
     info = calculate_birthday_info(birth, today)
     return jsonify(
@@ -109,6 +126,8 @@ def calendar_page():
         prev_month=prev_month,
         next_year=next_year,
         next_month=next_month,
+    today=today,
+        active_page="calendar",
     )
 
 
