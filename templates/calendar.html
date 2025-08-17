@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="calendar-header">
-  <a class="nav" href="{{ url_for('calendar_page', year=prev_year, month=prev_month) }}">←</a>
+  <a class="nav" href="{{ url_for('calendar_page', year=prev_year, month=prev_month) }}" title="Previous month">←</a>
   <h2>{{ month_name }} {{ year }}</h2>
-  <a class="nav" href="{{ url_for('calendar_page', year=next_year, month=next_month) }}">→</a>
+  <div class="cal-actions">
+    <a class="nav" href="{{ url_for('calendar_page', year=today.year, month=today.month) }}" title="Jump to current month">Today</a>
+    <a class="nav" href="{{ url_for('calendar_page', year=next_year, month=next_month) }}" title="Next month">→</a>
+  </div>
 </div>
 
 <div class="calendar-grid">
@@ -20,7 +23,8 @@
       {% if d == 0 %}
         <div class="day empty"></div>
       {% else %}
-        <a class="day" href="{{ url_for('calc') }}?birthday={{ '%04d-%02d-%02d'|format(year, month, d) }}">{{ d }}</a>
+  {% set is_today = (year == today.year and month == today.month and d == today.day) %}
+  <a class="day{% if is_today %} today{% endif %}" href="{{ url_for('calc') }}?birthday={{ '%04d-%02d-%02d'|format(year, month, d) }}">{{ d }}</a>
       {% endif %}
     {% endfor %}
   {% endfor %}

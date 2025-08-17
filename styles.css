@@ -1,10 +1,17 @@
-:root{--bg:#0f172a;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#22c55e;--accent2:#38bdf8;--danger:#ef4444}
+:root{--bg:#0f172a;--bg-grad:#0b1326;--card:#111827;--muted:#94a3b8;--text:#e5e7eb;--accent:#22c55e;--accent2:#38bdf8;--danger:#ef4444;--border:rgba(255,255,255,0.12)}
+html[data-theme="light"]{--bg:#f8fafc;--bg-grad:#e2e8f0;--card:#ffffff;--muted:#475569;--text:#0f172a;--accent:#16a34a;--accent2:#0284c7;--danger:#b91c1c;--border:#e2e8f0}
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(160deg,#0f172a 0%,#0b1326 100%);color:var(--text)}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:linear-gradient(160deg,var(--bg) 0%,var(--bg-grad) 100%);color:var(--text)}
 .container{max-width:900px;margin:40px auto;padding:0 20px}
 .subtitle{color:var(--muted);margin:-8px 0 24px}
-form{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:16px;border-radius:12px}
+.hero{margin-bottom:18px}
+.site-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.brand{margin:0}
+.nav{display:flex;gap:10px}
+.nav-link, .btn-secondary{color:var(--text);text-decoration:none;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer}
+.btn-secondary:hover{background:rgba(255,255,255,0.06)}
+form.form{display:flex;flex-wrap:wrap;gap:12px;align-items:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:16px;border-radius:12px}
 label{font-weight:600}
 input[type=date]{appearance:none;background:#ffffff;color:#0b1020;border:1px solid #d1d5db;border-radius:8px;padding:10px 12px}
 input[type=date]:focus{outline:none;box-shadow:0 0 0 3px rgba(148,163,184,.35)}
@@ -14,16 +21,25 @@ button#reset{background:transparent;color:var(--muted);border:1px solid rgba(255
 .results{margin-top:20px}
 .hidden{display:none}
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
-.card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);padding:16px;border-radius:12px}
+.card{background:rgba(255,255,255,0.04);border:1px solid var(--border);padding:16px;border-radius:12px}
 .card-title{color:var(--muted);font-size:.95rem;margin-bottom:6px}
 .card-value{font-size:1.8rem;font-weight:800}
 .card-foot{margin-top:6px;color:var(--muted)}
 .note{font-size:.85rem}
 .footer{margin-top:28px;color:var(--muted);font-size:.9rem}
 .fineprint{margin-top:12px;color:var(--muted);font-size:.85rem}
+/* Banner */
+.banner{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(120deg, rgba(56,189,248,0.15), rgba(34,197,94,0.15));border:1px solid var(--border);padding:14px 16px;border-radius:12px;margin-bottom:16px}
+.banner .label{color:var(--muted);font-size:.85rem}
+.banner .value{font-size:1.1rem;font-weight:700}
+/* Theme toggle script support */
+/* Links */
+a{color:#e5e7eb}
+a:visited{color:#e5e7eb}
+a:hover{color:#ffffff}
 /* Make the date input calendar icon visible on light input */
-input[type=date]{color-scheme:light}
-input[type=date]::-webkit-calendar-picker-indicator{filter:none; opacity:.9; cursor:pointer}
+input[type=date]{color-scheme:light; padding-right:36px}
+input[type=date]::-webkit-calendar-picker-indicator{filter:none; opacity:.95; cursor:pointer; width:22px; height:22px}
 input[type=date]::-webkit-inner-spin-button,
 input[type=date]::-webkit-clear-button{filter:none}
 /* Firefox */
