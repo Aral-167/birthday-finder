@@ -8,12 +8,58 @@
 </head>
 <body>
   <main class="container">
-  <h1>Birthday Finder</h1>
+  <header class="site-header">
+      <h1 class="brand">Birthday Finder</h1>
+      <nav class="nav">
+        <a class="nav-link{% if active_page=='home' %} active{% endif %}" href="{{ url_for('index') }}">Home</a>
+        <a class="nav-link{% if active_page=='calendar' %} active{% endif %}" href="{{ url_for('calendar_page') }}">Calendar</a>
+    <button id="theme-toggle" class="btn-secondary" type="button" aria-label="Toggle theme">Toggle theme</button>
+      </nav>
+    </header>
     {% if error %}
     <div class="error">{{ error }}</div>
     {% endif %}
     {% block content %}{% endblock %}
     <footer class="footer">Powered by Flask</footer>
   </main>
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" style="display:none"></div>
+  <script>
+    (function(){
+      const root = document.documentElement;
+      const KEY = 'bf-theme';
+      function applyTheme(t){ root.setAttribute('data-theme', t); toggleBtn && (toggleBtn.textContent = t === 'light' ? 'Dark mode' : 'Light mode'); }
+      function getPreferred(){
+        const saved = localStorage.getItem(KEY);
+        if(saved === 'light' || saved === 'dark') return saved;
+        return window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      }
+      const toggleBtn = document.getElementById('theme-toggle');
+      let current = getPreferred();
+      applyTheme(current);
+      if(toggleBtn){
+        toggleBtn.addEventListener('click', function(){
+          current = (root.getAttribute('data-theme') === 'light') ? 'dark' : 'light';
+          localStorage.setItem(KEY, current);
+          applyTheme(current);
+        });
+      }
+    })();
+
+    // Simple toast helper
+    window.showToast = function(message){
+      const el = document.getElementById('toast');
+      if(!el) return;
+      el.textContent = message;
+      el.style.display = 'block';
+      el.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>{
+        el.classList.remove('show');
+        // Hide after animation
+        setTimeout(()=>{ el.style.display='none'; }, 250);
+      }, 1500);
+    }
+  </script>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

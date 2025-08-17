@@ -2,6 +2,8 @@
   const form = document.getElementById('birthday-form');
   const input = document.getElementById('birthday');
   const results = document.getElementById('results');
+  const banner = document.getElementById('birth-banner');
+  const birthDateText = document.getElementById('birth-date-text');
   const weekdayEl = document.getElementById('weekday-born');
   const daysSinceEl = document.getElementById('days-since');
   const daysUntilEl = document.getElementById('days-until');
@@ -12,6 +14,7 @@
   const assumptionEl = document.getElementById('assumption');
   const nowEl = document.getElementById('now');
   const resetBtn = document.getElementById('reset');
+  const themeToggle = document.getElementById('theme-toggle');
 
   const DAY_MS = 24*60*60*1000;
 
@@ -23,6 +26,17 @@
   }
   updateClock();
   setInterval(updateClock, 1000);
+
+  // Theme toggle (standalone page)
+  (function(){
+    if(!themeToggle) return;
+    const root = document.documentElement;
+    const KEY='bf-theme';
+    function apply(t){ root.setAttribute('data-theme', t); themeToggle.textContent = t==='light'?'Dark mode':'Light mode'; }
+    function pref(){ const s=localStorage.getItem(KEY); if(s==='light'||s==='dark') return s; return matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'; }
+    let cur=pref(); apply(cur);
+    themeToggle.addEventListener('click', ()=>{ cur = root.getAttribute('data-theme')==='light' ? 'dark' : 'light'; localStorage.setItem(KEY, cur); apply(cur); });
+  })();
 
   function parseInputDate(value){
     // HTML date input gives YYYY-MM-DD. Create a local Date at midnight local time.
@@ -119,6 +133,10 @@
     ageNextEl.textContent = ageNext.toString();
   daysSinceBirthEl.textContent = totalSinceBirth.toString();
 
+  // Fill banner
+  birthDateText.textContent = fmt.format(birth);
+  banner.classList.remove('hidden');
+
     // Note for Feb 29 handling
     if(birth.getMonth()===1 && birth.getDate()===29){
       const msg = `You were born on Feb 29. In non-leap years, we use Feb 28 for calculations.`;
@@ -136,6 +154,7 @@
     input.value = '';
     results.classList.add('hidden');
     assumptionEl.textContent = '';
+  banner.classList.add('hidden');
     input.focus();
   });
 })();

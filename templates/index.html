@@ -1,11 +1,130 @@
 {% extends 'base.html' %}
 {% block content %}
-<p class="subtitle">Enter your birth date to see details.</p>
-<form action="{{ url_for('calc') }}" method="post" class="form">
-  <label for="birthday">Your birthday</label>
-  <input id="birthday" name="birthday" type="date" required />
-  <button type="submit">Check</button>
-</form>
+<section class="hero">
+  <p class="subtitle">Enter your birth date to see the weekday, days since/til birthdays, age on next birthday, and total days since birth.</p>
+  <form action="{{ url_for('calc') }}" method="post" class="form">
+    <label for="birthday">Your birthday</label>
+  <input id="birthday" name="birthday" type="date" required max="{{ today.isoformat() }}" placeholder="YYYY-MM-DD" />
+    <button type="submit">Check</button>
+    <a class="btn-secondary" href="{{ url_for('calendar_page') }}">Pick from calendar</a>
+  </form>
+  <div class="chips" aria-label="Quick picks">
+    <button type="button" class="chip" data-pick="today">Today</button>
+    <button type="button" class="chip" data-pick="2000-01-01">Jan 1, 2000</button>
+    <button type="button" class="chip" data-pick="2004-02-29">Feb 29, 2004</button>
+    <button type="button" class="chip" data-pick="random">Random</button>
+  <button type="button" id="chip-last" class="chip" style="display:none"></button>
+  </div>
+  <div id="preview" class="muted" style="margin-top:12px;display:none">
+    <span>Weekday: <strong id="pv-weekday"></strong></span>
+    <span class="badge" id="pv-turning" title="Age on next birthday"></span>
+  </div>
+  <p class="muted" style="margin-top:8px">Tip: Press Enter to submit. Use the Calendar for quick picking if the icon isn’t visible on your device.</p>
+</section>
+{% endblock %}
 
-<p class="muted">Prefer picking from a calendar? <a href="{{ url_for('calendar_page') }}">Open calendar</a>.</p>
+{% block scripts %}
+<script>
+  (function(){
+    // If the browser doesn't support date input, show a hint
+    const input = document.getElementById('birthday');
+  const form = input?.closest('form');
+  const submitBtn = form?.querySelector('button[type="submit"]');
+    if (input && input.type !== 'date') {
+      const hint = document.createElement('div');
+      hint.className = 'error';
+      hint.textContent = 'Your browser may not support the date picker; type YYYY-MM-DD or use the Calendar link.';
+      input.closest('section').insertBefore(hint, input.closest('form'));
+    }
+
+    // Quick pick chips
+    const chips = document.querySelectorAll('.chip');
+    function fmt(n){ return String(n).padStart(2,'0'); }
+    function toISO(d){ return d.getFullYear()+ '-' + fmt(d.getMonth()+1) + '-' + fmt(d.getDate()); }
+    function randDate(){
+      const start = new Date(1950,0,1).getTime();
+      const end = new Date().getTime();
+      const t = start + Math.floor(Math.random()*(end-start));
+      return new Date(t);
+    }
+    chips.forEach(ch => ch.addEventListener('click', () => {
+      let val = ch.getAttribute('data-pick');
+      if(val === 'today') val = toISO(new Date());
+      if(val === 'random') val = toISO(randDate());
+      input.value = val;
+      input.dispatchEvent(new Event('input', {bubbles:true}));
+      window.showToast && window.showToast('Picked ' + val);
+      input.focus();
+    }));
+
+    // Live preview for weekday + turning age
+    const preview = document.getElementById('preview');
+    const pvWeekday = document.getElementById('pv-weekday');
+    const pvTurning = document.getElementById('pv-turning');
+    const ERR_ID = 'inline-error';
+    function ensureErrEl(){
+      let el = document.getElementById(ERR_ID);
+      if(!el){
+        el = document.createElement('div');
+        el.id = ERR_ID; el.className='inline-error';
+        input.insertAdjacentElement('afterend', el);
+      }
+      return el;
+    }
+    function setDisabled(dis){ if(!submitBtn) return; submitBtn.disabled = dis; }
+    function validateDate(){
+      const v = input.value;
+      const el = ensureErrEl();
+      el.textContent = '';
+      setDisabled(false);
+      if(!v){ el.style.display='none'; return true; }
+      const today = new Date('{{ today.isoformat() }}T00:00:00');
+      const parts = v.split('-').map(Number); if(parts.length!==3){ el.style.display='none'; return true; }
+      const d = new Date(parts[0], parts[1]-1, parts[2]);
+      if(isNaN(d)) { el.textContent = 'Invalid date'; el.style.display='block'; setDisabled(true); return false; }
+      if(d > today){ el.textContent = 'Birth date can’t be in the future'; el.style.display='block'; setDisabled(true); return false; }
+      el.style.display='none'; return true;
+    }
+    function updatePreview(){
+      const v = input.value;
+      if(!v){ preview.style.display='none'; return; }
+      const parts = v.split('-').map(Number);
+      if(parts.length !== 3){ preview.style.display='none'; return; }
+      const by = parts[0], bm = parts[1]-1, bd = parts[2];
+      const birth = new Date(by, bm, bd);
+      if(isNaN(birth)) { preview.style.display='none'; return; }
+      // Weekday
+      const wd = birth.toLocaleDateString(undefined, { weekday:'long' });
+      pvWeekday.textContent = wd;
+      // Age on next birthday
+      const now = new Date();
+      const thisYear = now.getFullYear();
+      let next = new Date(thisYear, bm, bd);
+      if(next < new Date(thisYear, now.getMonth(), now.getDate())){
+        next = new Date(thisYear+1, bm, bd);
+      }
+      // Handle Feb 29 on non-leap years by using Feb 28
+      if(bm === 1 && bd === 29 && next.getMonth() !== 1){
+        next = new Date(next.getFullYear(), 1, 28);
+      }
+      const turning = next.getFullYear() - by;
+      pvTurning.textContent = 'Turning ' + turning;
+      preview.style.display='block';
+    }
+    input.addEventListener('input', ()=>{ validateDate(); updatePreview(); });
+    if(input.value){ validateDate(); updatePreview(); }
+
+    // Remember last used birthday
+    const LAST_KEY='bf-last';
+    const lastChip = document.getElementById('chip-last');
+    function syncLast(){
+      const last = localStorage.getItem(LAST_KEY);
+      if(last){ lastChip.style.display='inline-flex'; lastChip.dataset.pick = last; lastChip.textContent = 'Last used: ' + last; }
+    }
+    syncLast();
+    form?.addEventListener('submit', ()=>{ if(input.value) localStorage.setItem(LAST_KEY, input.value); });
+  })();
+  // Focus the input initially
+  document.getElementById('birthday')?.focus();
+</script>
 {% endblock %}

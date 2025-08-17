@@ -8,15 +8,29 @@
   </head>
   <body>
     <main class="container">
-      <h1>Birthday Finder</h1>
-      <p class="subtitle">Enter your birth date to see details.</p>
+      <header class="site-header">
+        <h1 class="brand">Birthday Finder</h1>
+        <nav class="nav">
+          <button id="theme-toggle" class="btn-secondary" type="button" aria-label="Toggle theme">Toggle theme</button>
+        </nav>
+      </header>
 
-      <form id="birthday-form" autocomplete="off">
-        <label for="birthday">Your birthday</label>
-        <input id="birthday" name="birthday" type="date" required />
-        <button type="submit">Check</button>
-        <button type="button" id="reset">Reset</button>
-      </form>
+      <section class="hero">
+        <p class="subtitle">Enter your birth date to see the weekday, days since/til birthdays, age on next birthday, and total days since birth.</p>
+        <form id="birthday-form" autocomplete="off" class="form">
+          <label for="birthday">Your birthday</label>
+          <input id="birthday" name="birthday" type="date" required />
+          <button type="submit">Check</button>
+          <button type="button" id="reset" class="btn-secondary">Reset</button>
+        </form>
+      </section>
+
+      <section id="birth-banner" class="banner hidden" aria-live="polite">
+        <div>
+          <div class="label">Birthday</div>
+          <div class="value" id="birth-date-text">—</div>
+        </div>
+      </section>
 
       <section id="results" class="results hidden" aria-live="polite">
         <div class="cards">
@@ -44,7 +58,7 @@
           </div>
         </div>
 
-        <p class="fineprint" id="assumption"></p>
+  <p class="fineprint" id="assumption"></p>
       </section>
 
       <footer class="footer">
